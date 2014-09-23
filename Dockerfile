@@ -1,15 +1,15 @@
-FROM phusion/baseimage:0.9.11
+FROM phusion/baseimage:latest
 MAINTAINER needo <needo@superhero.org>
 ENV DEBIAN_FRONTEND noninteractive
 
 # Set correct environment variables
 ENV HOME /root
 
-RUN usermod -u 99 nobody && \
-    usermod -g 100 nobody
-
 # Use baseimage-docker's init system
 CMD ["/sbin/my_init"]
+
+#Add a new user: xbmc
+RUN useradd -u 1002 xbmc
 
 RUN apt-get update -q
 
@@ -19,7 +19,7 @@ RUN apt-get install -qy mariadb-server
 # Tweak my.cnf
 RUN sed -i -e 's#\(bind-address.*=\).*#\1 0.0.0.0#g' /etc/mysql/my.cnf
 RUN sed -i -e 's#\(log_error.*=\).*#\1 /db/mysql_safe.log#g' /etc/mysql/my.cnf
-RUN sed -i -e 's/\(user.*=\).*/\1 nobody/g' /etc/mysql/my.cnf
+RUN sed -i -e 's/\(user.*=\).*/\1 xbmc/g' /etc/mysql/my.cnf
 
 # InnoDB engine to use 1 file per table, vs everything in ibdata.
 RUN echo '[mysqld]' > /etc/mysql/conf.d/innodb_file_per_table.cnf
